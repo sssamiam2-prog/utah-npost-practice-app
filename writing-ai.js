@@ -3,13 +3,14 @@
 window.WritingAI = (() => {
   async function gradeBatch(items) {
     const auth = window.PracticeAuth;
-    if (!auth?.configured?.()) throw new Error('Sign-in is not configured yet.');
-    if (!auth.isSignedIn?.()) throw new Error('Sign in to use AI writing feedback.');
-
-    const token = await auth.getAccessToken();
-    if (!token) throw new Error('Your session expired. Sign in again.');
-
     const cfg = window.APP_CONFIG || {};
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error('Online grading is not configured yet.');
+
+    let token = cfg.supabaseAnonKey;
+    if (auth?.isSignedIn?.()) {
+      token = (await auth.getAccessToken()) || token;
+    }
+
     const url = `${cfg.supabaseUrl.replace(/\/$/, '')}/functions/v1/grade-writing`;
     const anon = cfg.supabaseAnonKey;
 
