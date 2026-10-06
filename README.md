@@ -1,6 +1,6 @@
 # Utah NPOST Practice Center
 
-Timed, four-section **practice** exams modeled on Utah’s NPOST structure (math, reading, grammar, incident-report writing). Three full forms · 75 questions each · 70% section benchmarks.
+Timed, four-section **practice** exams modeled on Utah’s NPOST structure (math, reading, grammar, incident-report writing). Five full forms · 75 questions each · 70% section benchmarks.
 
 **Not affiliated with POST, Utah Tech, or any law-enforcement agency.** Questions are original study material, not copied from official exams.
 
@@ -64,7 +64,7 @@ node scripts/generate-exams.mjs
 | `app.js` | Exam UI, timers, scoring |
 | `auth.js` | Supabase sign-in and sync |
 | `config.js` | Supabase URL and anon key |
-| `data/exams.json` | Three practice forms |
+| `data/exams.json` | Five practice forms |
 | `styles.css` | Layout and theme |
 
 ## Official NPOST references

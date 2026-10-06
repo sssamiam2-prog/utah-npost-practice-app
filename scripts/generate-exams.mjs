@@ -1,5 +1,5 @@
 /**
- * Builds three original NPOST-style practice forms (75 items each).
+ * Builds five original NPOST-style practice forms (75 items each).
  * Run: node scripts/generate-exams.mjs
  */
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -38,8 +38,31 @@ function mathBank(seed) {
     { prompt: 'A number increased by 20% equals 84. What was the original number?', options: ['68', '70', '72', '74'], answer: 1, explanation: '84 ÷ 1.2 = 70.' },
     { prompt: 'How many minutes are in 2.75 hours?', options: ['155', '160', '165', '170'], answer: 2, explanation: '2.75 × 60 = 165 minutes.' },
     { prompt: 'A class has 48 candidates. If 70% must pass a drill, how many must pass?', options: ['32', '33', '34', '35'], answer: 2, explanation: '48 × 0.7 = 33.6, so 34 candidates at the 70% threshold count.' },
+    { prompt: 'Rent is $950 per month. What is the total for 11 months?', options: ['$9,450', '$10,450', '$10,550', '$11,450'], answer: 1, explanation: '950 × 11 = $10,450.' },
+    { prompt: 'A rope 84 inches long is cut into 6 equal pieces. How long is each piece?', options: ['12 in', '13 in', '14 in', '15 in'], answer: 2, explanation: '84 ÷ 6 = 14 inches.' },
+    { prompt: 'If 15% of a budget is $1,800, what is the full budget?', options: ['$10,000', '$11,000', '$12,000', '$13,000'], answer: 2, explanation: '1,800 ÷ 0.15 = $12,000.' },
+    { prompt: 'A printer makes 45 pages in 3 minutes. How many pages in 20 minutes at that rate?', options: ['260', '280', '300', '320'], answer: 2, explanation: '15 pages/min × 20 = 300 pages.' },
+    { prompt: 'Officer logs 2.5 hours on a report and 1.75 hours on patrol. Total hours?', options: ['3.75', '4.00', '4.25', '4.50'], answer: 2, explanation: '2.5 + 1.75 = 4.25 hours.' },
+    { prompt: 'A sale price is 30% off $160. What is the sale price?', options: ['$108', '$112', '$116', '$120'], answer: 1, explanation: '30% off leaves 70%: 160 × 0.7 = $112.' },
+    { prompt: 'How many 8-ounce cups can be filled from a 2-gallon container? (1 gallon = 128 ounces)', options: ['24', '28', '32', '36'], answer: 2, explanation: '2 × 128 = 256 oz; 256 ÷ 8 = 32 cups.' },
+    { prompt: 'Average of four test scores 70, 82, 78, and 90 is?', options: ['78', '80', '82', '84'], answer: 1, explanation: '(70+82+78+90) ÷ 4 = 80.' },
+    { prompt: 'A map scale is 1 inch = 4 miles. Two towns 7 inches apart on the map are how many miles apart?', options: ['24', '26', '28', '30'], answer: 2, explanation: '7 × 4 = 28 miles.' },
+    { prompt: 'Inventory shows 132 vests and 18 are damaged. What percent are usable?', options: ['82%', '84%', '86%', '88%'], answer: 2, explanation: '114 usable; 114 ÷ 132 ≈ 86.4%.' },
+    { prompt: 'Overtime is paid at 1.5 times $22/hour. What is overtime pay for 4 hours?', options: ['$120', '$126', '$132', '$138'], answer: 2, explanation: '33 × 4 = $132.' },
+    { prompt: 'A witness waits 35 minutes plus 1.2 hours. Total wait in minutes?', options: ['95', '102', '107', '112'], answer: 2, explanation: '1.2 hr = 72 min; 72 + 35 = 107 minutes.' },
+    { prompt: 'If 3/8 of a shift is training, how many minutes of training are in a 480-minute shift?', options: ['160', '170', '180', '190'], answer: 2, explanation: '480 × 3/8 = 180 minutes.' },
+    { prompt: 'A donation goal is $5,000; $3,250 is collected. How much remains?', options: ['$1,650', '$1,750', '$1,850', '$1,950'], answer: 1, explanation: '5,000 − 3,250 = $1,750.' },
+    { prompt: 'Speed is 55 mph. How far in 18 minutes?', options: ['15.5 mi', '16.0 mi', '16.5 mi', '17.0 mi'], answer: 2, explanation: '18 min = 0.3 hr; 55 × 0.3 = 16.5 miles.' },
+    { prompt: 'A case file requires 5 tabs per report and there are 36 reports. How many tabs?', options: ['160', '170', '180', '190'], answer: 2, explanation: '5 × 36 = 180 tabs.' },
+    { prompt: 'Convert 0.625 to a fraction in lowest terms.', options: ['5/8', '3/5', '2/3', '7/12'], answer: 0, explanation: '0.625 = 625/1000 = 5/8.' },
+    { prompt: 'Two officers split 11 hours of desk duty evenly. How many hours each?', options: ['5.0', '5.25', '5.5', '5.75'], answer: 2, explanation: '11 ÷ 2 = 5.5 hours each.' },
+    { prompt: 'A vehicle loan balance drops from $9,600 to $8,400. What percent decrease?', options: ['10%', '12.5%', '14%', '15%'], answer: 1, explanation: '1,200 ÷ 9,600 = 12.5%.' },
   ];
-  return items.map((q, i) => ({ ...q, prompt: `[Form ${seed}] ${q.prompt}` }));
+  return Array.from({ length: 20 }, (_, i) => {
+    const q = items[(i + (seed - 1) * 4) % items.length];
+    const base = q.prompt.replace(/^\[Form \d+\] /, '');
+    return { ...q, prompt: `[Form ${seed}] ${base}` };
+  });
 }
 
 const READING_PASSAGES = [
@@ -98,11 +121,34 @@ const READING_PASSAGES = [
       { prompt: 'Who must consent for applicants under 18?', options: ['School principal', 'Parent or guardian', 'Mayor', 'Post advisor only'], answer: 1, explanation: 'Parent or guardian consent is required under 18.' },
     ],
   },
+  {
+    title: 'Body-worn camera policy excerpt',
+    text: 'Officers must activate body-worn cameras when responding to calls for service, initiating traffic stops, and conducting arrests. Recording continues until the event ends and the officer leaves the scene. Officers may pause recording only in strictly limited situations such as interviews with victims of sensitive crimes when approved by a supervisor. Footage is uploaded by the end of the shift. Tampering with recordings is prohibited.',
+    questions: [
+      { prompt: 'When must cameras be activated?', options: ['Only during arrests', 'Calls for service, traffic stops, and arrests', 'Only when a supervisor is present', 'Only at the station'], answer: 1, explanation: 'Activation is required for calls, traffic stops, and arrests.' },
+      { prompt: 'When may recording be paused?', options: ['Any time the officer chooses', 'Limited situations such as sensitive victim interviews with supervisor approval', 'During paperwork only', 'Never'], answer: 1, explanation: 'Pauses are limited and require supervisor approval in sensitive cases.' },
+      { prompt: 'When must footage be uploaded?', options: ['Within 24 hours', 'By end of shift', 'Weekly', 'Only upon request'], answer: 1, explanation: 'Upload is required by end of shift.' },
+      { prompt: 'What is explicitly prohibited?', options: ['Uploading footage', 'Tampering with recordings', 'Using cameras on traffic stops', 'Supervisor review'], answer: 1, explanation: 'Tampering with recordings is prohibited.' },
+      { prompt: 'How long should recording continue?', options: ['Five minutes after arrival', 'Until the event ends and the officer leaves the scene', 'Until backup arrives', 'Until dispatch clears the call'], answer: 1, explanation: 'Recording continues until the event ends and the officer leaves.' },
+    ],
+  },
+  {
+    title: 'Evidence drop-off hours',
+    text: 'The property room accepts evidence Monday through Friday from 08:00 to 16:30. After-hours drop-offs require approval from the watch commander and must use the secure locker in the sally port. Each submission needs a completed property form, case number, and item count. Firearms and narcotics require a second officer signature. The property clerk returns a receipt copy to the submitting officer.',
+    questions: [
+      { prompt: 'What are standard drop-off hours?', options: ['24/7', 'Mon–Fri 08:00–16:30', 'Weekends only', 'Mon–Fri 06:00–14:00'], answer: 1, explanation: 'Standard hours are Monday–Friday, 08:00 to 16:30.' },
+      { prompt: 'What is required for after-hours drop-offs?', options: ['Email only', 'Watch commander approval and secure locker', 'Front desk sign-in only', 'No special steps'], answer: 1, explanation: 'After-hours requires watch commander approval and the secure locker.' },
+      { prompt: 'Which items need a second officer signature?', options: ['All clothing', 'Firearms and narcotics', 'Paper reports only', 'Found bicycles'], answer: 1, explanation: 'Firearms and narcotics require a second officer signature.' },
+      { prompt: 'What does the clerk provide to the submitting officer?', options: ['A text message', 'A receipt copy', 'A court date', 'A new case number only'], answer: 1, explanation: 'The clerk returns a receipt copy.' },
+      { prompt: 'Which documentation is required with each submission?', options: ['Social media post', 'Property form, case number, and item count', 'Witness list only', 'Driver license copy only'], answer: 1, explanation: 'Each submission needs the property form, case number, and item count.' },
+    ],
+  },
 ];
 
 function readingBank(formId) {
   const out = [];
-  for (const passage of READING_PASSAGES) {
+  const passages = READING_PASSAGES.map((_, i) => READING_PASSAGES[(i + formId - 1) % READING_PASSAGES.length]);
+  for (const passage of passages) {
     for (const q of passage.questions) {
       out.push({
         passageTitle: passage.title,
@@ -152,7 +198,9 @@ function grammarBank(formId) {
     { prompt: 'The data {A:is|B:are|C:were|D:have been} being analyzed tonight.', answer: 0, explanation: 'Treat "data" as singular mass noun in formal usage here: "is".' },
     { prompt: 'Please {A:bring|B:take|C:carry|D:fetch} this form to the records clerk.', answer: 0, explanation: 'Speaker-focused motion toward listener uses "bring" appropriately in many departments; "take" if away—context accepts bring.' },
   ];
-  return templates.map((t, i) => ({
+  const start = (formId - 1) * 3;
+  const ordered = Array.from({ length: templates.length }, (_, i) => templates[(i + start) % templates.length]);
+  return ordered.map((t, i) => ({
     prompt: `[Set ${formId}-${i + 1}] ${t.prompt.replace(/\{A:([^|]+)\|B:([^|]+)\|C:([^|]+)\|D:([^}]+)\}/g, (_, a, b, c, d) => {
       const parts = [a, b, c, d];
       const letters = ['A', 'B', 'C', 'D'];
@@ -237,7 +285,9 @@ function writingBank(formId) {
       explanation: 'State alarm type, secure building, keyholder status, reset.',
     },
   ];
-  return scenarios.map((s, i) => ({
+  const start = ((formId - 1) * 2) % scenarios.length;
+  const picked = Array.from({ length: 10 }, (_, i) => scenarios[(i + start) % scenarios.length]);
+  return picked.map((s, i) => ({
     ...s,
     passageTitle: `${s.passageTitle} (Form ${formId})`,
     prompt: `[Item ${i + 1}] ${s.prompt}`,
@@ -272,6 +322,8 @@ const exams = [
   buildExam(1, 'Practice Exam I'),
   buildExam(2, 'Practice Exam II'),
   buildExam(3, 'Practice Exam III'),
+  buildExam(4, 'Practice Exam IV'),
+  buildExam(5, 'Practice Exam V'),
 ];
 
 mkdirSync(outDir, { recursive: true });
