@@ -17,6 +17,33 @@ window.PracticeAuth = (() => {
     return Boolean(cfg.supabaseUrl && cfg.supabaseAnonKey);
   }
 
+  /** Stable redirect URL (must match Supabase Auth → URL Configuration exactly). */
+  function oauthRedirectUrl() {
+    let path = window.location.pathname.replace(/\/index\.html$/i, '');
+    if (!path.endsWith('/')) path += '/';
+    return `${window.location.origin}${path}`;
+  }
+
+  function stripAuthParamsFromUrl() {
+    const clean = oauthRedirectUrl();
+    if (window.location.href !== clean) {
+      window.history.replaceState({}, document.title, clean);
+    }
+  }
+
+  function readOAuthErrorFromUrl() {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const query = new URLSearchParams(window.location.search);
+    const raw = hash.get('error_description') || hash.get('error')
+      || query.get('error_description') || query.get('error');
+    if (!raw) return null;
+    try {
+      return decodeURIComponent(raw.replace(/\+/g, ' '));
+    } catch {
+      return raw;
+    }
+  }
+
   function renderBar() {
     const el = bar();
     if (!el) return;
@@ -63,8 +90,15 @@ window.PracticeAuth = (() => {
 
   async function signInGoogle() {
     if (!client) return;
-    const redirectTo = window.location.origin + window.location.pathname;
-    await client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+    stripAuthParamsFromUrl();
+    const { error } = await client.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: oauthRedirectUrl(),
+        skipBrowserRedirect: false,
+      },
+    });
+    if (error) announceAuth(error.message);
   }
 
   async function signInEmail(email, password) {
@@ -152,10 +186,29 @@ window.PracticeAuth = (() => {
       readyResolve();
       return;
     }
-    client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
-    const { data: { session } } = await client.auth.getSession();
+    client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+      auth: {
+        flowType: 'pkce',
+        detectSessionInUrl: true,
+        persistSession: true,
+      },
+    });
+
+    const hadAuthCallback = window.location.search.includes('code=')
+      || /(?:^|[#&])(error|access_token)=/.test(window.location.hash);
+    const oauthErr = readOAuthErrorFromUrl();
+
+    const { data: { session }, error: sessionError } = await client.auth.getSession();
     user = session?.user ?? null;
+
+    if (hadAuthCallback || oauthErr) stripAuthParamsFromUrl();
+
     renderBar();
+    if (oauthErr) {
+      announceAuth(`${oauthErr} Click “Continue with Google” to try again.`);
+    } else if (sessionError && hadAuthCallback) {
+      announceAuth(`${sessionError.message} Click “Continue with Google” to try again.`);
+    }
     if (user) {
       const merged = await mergeAfterLogin(getLocalState(), validState);
       if (merged) setMergedState(merged);
