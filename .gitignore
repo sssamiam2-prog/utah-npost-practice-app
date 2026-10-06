@@ -2,3 +2,10 @@
 Thumbs.db
 .supabase/
 supabase/.temp/
+# Local secrets — never commit
+API Secret
+.env
+.env.*
+.env.local
+*.pem
+credentials.json

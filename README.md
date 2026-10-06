@@ -54,17 +54,21 @@ Without keys, the app still works; progress stays in the browser only.
 
 After you finish an exam, open **Writing review** and click **Grade writing with Google AI** (requires sign-in).
 
+### Where the key lives (important)
+
+- The **browser app never reads your API key** — not from `config.js`, not from an `API Secret` file, not from GitHub.
+- The key is stored only as **`GEMINI_API_KEY`** in **Supabase → Edge Functions → Secrets** (encrypted server-side).
+- The public site calls your Supabase function; the function calls Google Gemini using that secret.
+
+If you keep a local file (e.g. `API Secret`) to copy the key into Supabase, that file is **gitignored** and must **never** be pushed to GitHub. After the secret is saved in Supabase, you can delete the local file.
+
+### One-time setup
+
 1. Create a [Google AI Studio API key](https://aistudio.google.com/apikey).
-2. In Supabase: **Project Settings → Edge Functions → Secrets**, add `GEMINI_API_KEY` with that key.
-3. Deploy the function (once):
+2. Supabase → **Edge Functions → Secrets** → add name `GEMINI_API_KEY`, paste the key, **Save**.
+3. Deploy `supabase/functions/grade-writing` once (Supabase dashboard **Deploy a new function**, or CLI with a personal access token).
 
-```bash
-npx supabase functions deploy grade-writing --project-ref xgpbethmizfnazlafiks
-```
-
-Or ask Cursor to deploy `supabase/functions/grade-writing` via the Supabase MCP.
-
-The API key stays on the server; the browser never sees it. AI scores follow the same three-point rubric as manual review and include written feedback per question.
+AI scores use the same three-point rubric as manual review and include written feedback per question.
 
 ## Regenerate exam JSON
 
