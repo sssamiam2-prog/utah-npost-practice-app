@@ -9,3 +9,7 @@ API Secret
 .env.local
 *.pem
 credentials.json
+.deploy-b64.txt
+.cdp-expr.json
+.test-grade-body.json
+.test-gemini-body.json

@@ -57,24 +57,33 @@ Return ONLY JSON (no markdown):
   const prompt = `${rubric}\n\nITEMS:\n${JSON.stringify(items)}`;
 
   const model = Deno.env.get("GEMINI_MODEL") ?? "gemini-3.8-flash";
-  const geminiRes = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.2,
-          responseMimeType: "application/json",
-        },
-      }),
-    },
-  );
-
-  if (!geminiRes.ok) {
-    const errText = await geminiRes.text();
-    console.error("Gemini error", geminiRes.status, errText);
+  let geminiRes: Response | null = null;
+  let errText = "";
+  for (let attempt = 0; attempt < 4; attempt++) {
+    geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.2,
+            responseMimeType: "application/json",
+          },
+        }),
+      },
+    );
+    if (geminiRes.ok) break;
+    errText = await geminiRes.text();
+    const retryable = geminiRes.status === 503 || geminiRes.status === 429;
+    if (!retryable || attempt === 3) {
+      console.error("Gemini error", geminiRes.status, errText);
+      return json({ error: "Google AI grading failed. Try again later." }, 502);
+    }
+    await new Promise((r) => setTimeout(r, 750 * (attempt + 1)));
+  }
+  if (!geminiRes?.ok) {
     return json({ error: "Google AI grading failed. Try again later." }, 502);
   }
 
