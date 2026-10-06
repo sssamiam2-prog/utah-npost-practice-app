@@ -56,7 +56,7 @@ Return ONLY JSON (no markdown):
 
   const prompt = `${rubric}\n\nITEMS:\n${JSON.stringify(items)}`;
 
-  const model = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.0-flash";
+  const model = Deno.env.get("GEMINI_MODEL") ?? "gemini-3.8-flash";
   const geminiRes = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
     {
