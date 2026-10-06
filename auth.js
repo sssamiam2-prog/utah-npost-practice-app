@@ -224,6 +224,8 @@ window.PracticeAuth = (() => {
     readyResolve();
   }
 
+  readyResolve();
+
   return {
     ready,
     init,

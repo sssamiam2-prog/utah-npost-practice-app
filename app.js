@@ -61,7 +61,6 @@ app.innerHTML=`<div class="panel center-panel"><h1 tabindex="-1">Could not load 
 return;
 }
 try{localStorage.setItem(KEY+'-check','1');localStorage.removeItem(KEY+'-check');}catch{storageOK=false;document.getElementById('storage-warning').hidden=false;}
-await window.PracticeAuth?.ready;
 await window.PracticeAuth?.init?.(validState,readSaved,(merged)=>{applyLoadedState(merged);});
 if(!state){state=readSaved();applyLoadedState(state);}
 const localBadge=document.querySelector('.local');
