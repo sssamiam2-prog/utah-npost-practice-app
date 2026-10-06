@@ -50,6 +50,22 @@ $env:SUPABASE_ACCESS_TOKEN = "sbp_your_token_here"
 
 Without keys, the app still works; progress stays in the browser only.
 
+## AI writing feedback (Google Gemini)
+
+After you finish an exam, open **Writing review** and click **Grade writing with Google AI** (requires sign-in).
+
+1. Create a [Google AI Studio API key](https://aistudio.google.com/apikey).
+2. In Supabase: **Project Settings → Edge Functions → Secrets**, add `GEMINI_API_KEY` with that key.
+3. Deploy the function (once):
+
+```bash
+npx supabase functions deploy grade-writing --project-ref xgpbethmizfnazlafiks
+```
+
+Or ask Cursor to deploy `supabase/functions/grade-writing` via the Supabase MCP.
+
+The API key stays on the server; the browser never sees it. AI scores follow the same three-point rubric as manual review and include written feedback per question.
+
 ## Regenerate exam JSON
 
 ```bash

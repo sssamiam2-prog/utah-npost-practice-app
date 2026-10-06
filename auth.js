@@ -226,11 +226,18 @@ window.PracticeAuth = (() => {
 
   readyResolve();
 
+  async function getAccessToken() {
+    if (!client) return null;
+    const { data: { session } } = await client.auth.getSession();
+    return session?.access_token ?? null;
+  }
+
   return {
     ready,
     init,
     queueSync,
     isSignedIn: () => Boolean(user),
     configured,
+    getAccessToken,
   };
 })();
