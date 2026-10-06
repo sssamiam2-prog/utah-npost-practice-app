@@ -20,13 +20,33 @@ npx --yes serve .
 
 Then open the URL shown (usually `http://localhost:3000`).
 
-## Sign-in and cloud sync (optional)
+## Sign-in and cloud sync (Supabase)
 
-1. Create a [Supabase](https://supabase.com) project (free tier is fine).
-2. Run `supabase/schema.sql` in the Supabase SQL editor.
-3. In **Authentication → Providers**, enable **Email** and/or **Google** (for Google, add your GitHub Pages URL under redirect URLs).
-4. Copy **Project URL** and **anon public** key into `config.js` (see `config.example.js`).
-5. Redeploy or refresh the site.
+The app is ready for Supabase; **`config.js` is empty until a project exists.**
+
+Your Cursor MCP was pointing at project `ezcmgehexkzhjzfxsptb`, which **does not exist** (no DNS). Create a new project once, then wire it up:
+
+### Automated (recommended)
+
+1. Create a token: [Supabase → Account → Access Tokens](https://supabase.com/dashboard/account/tokens)
+2. In PowerShell from this folder:
+
+```powershell
+$env:SUPABASE_ACCESS_TOKEN = "sbp_your_token_here"
+.\scripts\setup-supabase.ps1
+```
+
+3. In the Supabase dashboard: **Authentication → URL Configuration** — set site + redirect URL to  
+   `https://sssamiam2-prog.github.io/utah-npost-practice-app/`  
+   Enable **Email** and/or **Google** under Providers.
+4. Commit and push `config.js` (anon key is safe to publish; access is enforced by Row Level Security).
+
+### Manual
+
+1. New project at [supabase.com/dashboard](https://supabase.com/dashboard/projects)
+2. Run `supabase/schema.sql` in the SQL editor
+3. Copy URL + anon key into `config.js`
+4. Update `~/.cursor/mcp.json` → `project_ref=<your-new-ref>`
 
 Without keys, the app still works; progress stays in the browser only.
 
